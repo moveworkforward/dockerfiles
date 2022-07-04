@@ -7,4 +7,4 @@ ENV JAVA_ALPINE_VERSION=8.212.04-r0
 
 LABEL maintainer=support@moveworkforward.com
 
-CMD atlas-run-standalone --product jira --http-port 2990 --server 8.5.5 --jvmargs -Xmx4096M -DskipAllPrompts=true -Dmoveworkforward.dev.mode=true
+CMD atlas-run-standalone --product jira --http-port 2990 --server 0.0.0.0 --version 8.5.5 --jvmargs -Xmx4096M -DskipAllPrompts=true -Dmoveworkforward.dev.mode=true
