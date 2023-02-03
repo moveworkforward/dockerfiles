@@ -9,9 +9,9 @@ ENV JAVA_ALPINE_VERSION=8.212.04-r0
 
 # update the repository sources list
 # and install dependencies
-# RUN apt-get update \
-#     && apt-get install -y curl \
-#     && apt-get -y autoclean
+RUN sudo apt-get update \
+    && apt-get install -y curl \
+    && apt-get -y autoclean
 
 # nvm environment variables
 RUN mkdir /usr/local/nvm
