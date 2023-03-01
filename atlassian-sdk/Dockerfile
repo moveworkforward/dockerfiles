@@ -1,36 +1,54 @@
-FROM moveworkforward/atlas-run-standalone:alpine
-
+FROM node:16.19-alpine
 LABEL maintainer=support@moveworkforward.com
+# install java 8
+RUN { \
+        echo '#!/bin/sh'; \
+        echo 'set -e'; \
+        echo; \
+        echo 'dirname "$(dirname "$(readlink -f "$(which javac || which java)")")"'; \
+    } > /usr/local/bin/docker-java-home \
+    && chmod +x /usr/local/bin/docker-java-home
+ENV JAVA_HOME /usr/lib/jvm/java-1.8-openjdk
+ENV PATH $PATH:/usr/lib/jvm/java-1.8-openjdk/jre/bin:/usr/lib/jvm/java-1.8-openjdk/bin
 
-ENV JAVA_HOME=/usr/lib/jvm/java-1.8-openjdk
-ENV PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/jvm/java-1.8-openjdk/jre/bin:/usr/lib/jvm/java-1.8-openjdk/bin
-ENV JAVA_VERSION=8u212
-ENV JAVA_ALPINE_VERSION=8.212.04-r0
+ENV JAVA_VERSION 8u212
+ENV JAVA_ALPINE_VERSION 8.345.01-r3
 
-# update the repository sources list
-# and install dependencies
-RUN sudo apt-get update \
-    && apt-get install -y curl \
-    && apt-get -y autoclean
+RUN set -x \
+    && apk add --no-cache \
+        openjdk8="$JAVA_ALPINE_VERSION" \
+    && [ "$JAVA_HOME" = "$(docker-java-home)" ]
 
-# nvm environment variables
-RUN mkdir /usr/local/nvm
-ENV NVM_DIR /usr/local/nvm
-ENV NODE_VERSION 16.17.0
+# Atlassian SDK installation section
+RUN apk add --no-cache curl tar bash procps sudo
 
-# https://github.com/creationix/nvm#install-script
-RUN wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
+# Install custom Maven version because the on included in the Atlassian plugin SDK is not compatible with the SDK - doh!
+# https://community.developer.atlassian.com/t/amps-8-3-1-build-failure/54483
+ENV MAVEN_VERSION 3.8.6
+ENV MAVEN_HOME /usr/lib/mvn
+ENV PATH $MAVEN_HOME/bin:$PATH
 
-# install node and npm
-RUN source $NVM_DIR/nvm.sh \
-    && nvm install $NODE_VERSION \
-    && nvm alias default $NODE_VERSION \
-    && nvm use default
+RUN wget http://archive.apache.org/dist/maven/maven-3/$MAVEN_VERSION/binaries/apache-maven-$MAVEN_VERSION-bin.tar.gz && \
+  tar -zxvf apache-maven-$MAVEN_VERSION-bin.tar.gz && \
+  rm apache-maven-$MAVEN_VERSION-bin.tar.gz && \
+  mv apache-maven-$MAVEN_VERSION /usr/lib/mvn
 
-# add node and npm to path so the commands are available
-ENV NODE_PATH $NVM_DIR/v$NODE_VERSION/lib/node_modules
-ENV PATH $NVM_DIR/versions/node/v$NODE_VERSION/bin:$PATH
+ARG ATLASSIAN_PLUGIN_SDK_VERSION=8.2.6
+ARG BASE_URL=https://packages.atlassian.com/maven/repository/public/com/atlassian/amps/
 
-# confirm installation
+# Configure ATLAS_MVN to ensure the SDK picks up the custom Maven version
+# https://developer.atlassian.com/server/framework/atlassian-sdk/changing-the-default-maven-version/
+ENV ATLAS_MVN $MAVEN_HOME/bin/mvn
+
+RUN mkdir -p /usr/share/atlassian-plugin-sdk \
+  && curl -fsSL -o /tmp/atlassian-plugin-sdk.tar.gz ${BASE_URL}/atlassian-plugin-sdk/${ATLASSIAN_PLUGIN_SDK_VERSION}/atlassian-plugin-sdk-${ATLASSIAN_PLUGIN_SDK_VERSION}.tar.gz \
+  && tar -xzf /tmp/atlassian-plugin-sdk.tar.gz -C /usr/share \
+  && rm -f /tmp/atlassian-plugin-sdk.tar.gz \
+  && ln -s /usr/share/atlassian-plugin-sdk-${ATLASSIAN_PLUGIN_SDK_VERSION}/bin/* /usr/bin/
+
+# Validation
+
+CMD ["/bin/sh" "-c" "atlas-run-standalone --product jira --http-port 2990 --server 0.0.0.0 --jvmargs -Xmx4096M -DskipAllPrompts=true -Dmoveworkforward.dev.mode=true"]
+
 RUN node -v
 RUN npm -v
