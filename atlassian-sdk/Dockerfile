@@ -1,5 +1,7 @@
-FROM cimg/openjdk:8.0.362-node
+FROM cimg/openjdk:17.0.11-node
 LABEL maintainer=support@moveworkforward.com
+
+ENV JDK_JAVA_OPTIONS="--add-opens=java.base/java.math=ALL-UNNAMED --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.lang.reflect=ALL-UNNAMED --add-opens=java.base/java.time=ALL-UNNAMED --add-opens=java.base/java.time.format=ALL-UNNAMED --add-opens=java.base/java.util=ALL-UNNAMED --add-opens=java.base/java.net=ALL-UNNAMED --add-opens=java.base/java.util.regex=ALL-UNNAMED --add-opens=java.base/sun.net.spi=ALL-UNNAMED --add-opens=java.base/java.io=ALL-UNNAMED"
 
 RUN sudo apt-get update \
               &&  sudo apt-get install apt-transport-https \
