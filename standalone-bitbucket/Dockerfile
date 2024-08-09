@@ -1,4 +1,4 @@
-FROM moveworkforward/atlassian-sdk:17-jdk-8.2.28-atlas-20-node
+FROM moveworkforward/atlassian-sdk:17-jdk-9.0.4-atlas-20-node
 
 LABEL maintainer=support@moveworkforward.com
 

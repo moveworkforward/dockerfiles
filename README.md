@@ -24,6 +24,7 @@ docker run -d -p 1990:1990 moveworkforward/atlas-run-standalone:confluence-alpin
 Platform 7 images:
 ```
 moveworkforward/atlassian-sdk:17-jdk-8.2.28-atlas-20-node
+moveworkforward/atlassian-sdk:17-jdk-9.0.4-atlas-20-node
 moveworkforward/atlas-run-standalone:bitbucket-9
 moveworkforward/atlas-run-standalone:jira-10
 moveworkforward/atlas-run-standalone:confluence-9
