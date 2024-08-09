@@ -1,10 +1,7 @@
-FROM moveworkforward/atlas-run-standalone:alpine
-
-ENV JAVA_HOME=/usr/lib/jvm/java-1.8-openjdk
-ENV PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/jvm/java-1.8-openjdk/jre/bin:/usr/lib/jvm/java-1.8-openjdk/bin
-ENV JAVA_VERSION=8u212
-ENV JAVA_ALPINE_VERSION=8.212.04-r0
+FROM moveworkforward/atlassian-sdk:17-jdk-9.0.4-atlas-20-node
 
 LABEL maintainer=support@moveworkforward.com
 
-CMD atlas-run-standalone --product jira --http-port 2990 --server 0.0.0.0 --version 8.5.5 --jvmargs -Xmx4096M -DskipAllPrompts=true -Dmoveworkforward.dev.mode=true
+LABEL com.circleci.preserve-entrypoint=true
+
+ENTRYPOINT ["/bin/sh", "-c", "atlas-run-standalone --product jira --http-port 2990 --version 10.0.0-m0008 --server 0.0.0.0 --jvmargs -Xmx4096M -DskipAllPrompts=true -Dmoveworkforward.dev.mode=true"]

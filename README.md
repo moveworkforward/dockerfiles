@@ -4,7 +4,7 @@ The file contains docker files to build the images used in CI and other cases.
 # How to build and push an image
 ```
 cd <into the docker folder>
-docker build .
+docker build --platform linux/amd64 .  // for amd64
 docker image tag <IMAGE-ID> moveworkforward/atlas-run-standalone:<TAG>
 docker image push -a moveworkforward/atlas-run-standalone
 ```
@@ -19,4 +19,13 @@ docker image tag b1155466b6d9564587388c8d6e6703341915d04cf95b8ec20649bc83294306e
 # Run a container locally
 ```
 docker run -d -p 1990:1990 moveworkforward/atlas-run-standalone:confluence-alpine
+```
+
+Platform 7 images:
+```
+moveworkforward/atlassian-sdk:17-jdk-8.2.28-atlas-20-node
+moveworkforward/atlassian-sdk:17-jdk-9.0.4-atlas-20-node
+moveworkforward/atlas-run-standalone:bitbucket-9
+moveworkforward/atlas-run-standalone:jira-10
+moveworkforward/atlas-run-standalone:confluence-9
 ```
