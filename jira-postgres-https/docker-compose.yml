@@ -1,0 +1,64 @@
+version: '3'
+
+services:
+  postgresql:
+    image: postgres:14-alpine
+    networks:
+      - jiranet
+    volumes:
+      - ./postgress:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+    environment:
+      - 'POSTGRES_USER=jira'
+      # CHANGE THE PASSWORD!
+      - 'POSTGRES_PASSWORD=jellyfish'
+      - 'POSTGRES_DB=jiradb'
+      - 'POSTGRES_ENCODING=UNICODE'
+      - 'POSTGRES_COLLATE=C'
+      - 'POSTGRES_COLLATE_TYPE=C'
+    logging:
+      # limit logs retained on host to 25MB
+      driver: "json-file"
+      options:
+        max-size: "500k"
+        max-file: "50"
+
+  jira_node_1:
+    depends_on:
+      - postgresql
+    image: moveworkforward/jira-software-https:9.2.0-jdk11
+    networks:
+      - jiranet
+    volumes:
+      - ./jira_home:/var/atlassian/application-data/jira/shared
+    ports:
+      - '8080:8080'
+      - '8000:8000'
+      - '8443:8443'
+    environment:
+      - 'ATL_JDBC_URL=jdbc:postgresql://postgresql:5432/jiradb'
+      - 'ATL_JDBC_USER=jira'
+      - 'ATL_JDBC_PASSWORD=jellyfish'
+      - 'ATL_DB_DRIVER=org.postgresql.Driver'
+      - 'ATL_DB_TYPE=postgres72'
+      - 'JVM_MINIMUM_MEMORY=2048m'
+      - 'JVM_MAXIMUM_MEMORY=4096m'
+      - 'JVM_SUPPORT_RECOMMENDED_ARGS=${JAVA_CUSTOM_ARGS} -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:8000'
+      - 'CLUSTERED=true'
+      - 'moveworkforward.dev.mode=true'
+      - 'JIRA_NODE_ID=node_1'
+    logging:
+      # limit logs retained on host to 25MB
+      driver: "json-file"
+      options:
+        max-size: "500k"
+        max-file: "50"
+
+volumes:
+  postgresqldata:
+    external: false
+
+networks:
+  jiranet:
+    driver: bridge
