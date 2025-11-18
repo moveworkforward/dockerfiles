@@ -4,9 +4,19 @@ The file contains docker files to build the images used in CI and other cases.
 # How to build and push an image
 ```
 cd <into the docker folder>
-docker build --platform linux/amd64 .  // for amd64
+docker build --platform linux/amd64 .  // for amd64 - required for CircleCI, for Apple use: --platform linux/arm64
 docker image tag <IMAGE-ID> moveworkforward/atlas-run-standalone:<TAG>
-docker image push -a moveworkforward/atlas-run-standalone
+docker image push moveworkforward/atlas-run-standalone:<TAG>
+```
+`IMAGE-ID` can be found by running `docker images` after the build command.
+For instance `IMAGE-ID=9c3104152ae500b1089fe29f43fb88b367dd62e9041aff1014bc161278885362` for output:
+```
+ => => exporting layers                                                                                                                                                                                             15.9s
+ => => exporting manifest sha256:58dc4192c67ede53ea143ee8c430ea9781a3216d34c61371ad9b69da0a98a0e8                                                                                                                    0.0s
+ => => exporting config sha256:2080bcf70acb45d9a80baaef03d1cb982fde81b03682271840482ac64fcc54a2                                                                                                                      0.0s 
+ => => exporting attestation manifest sha256:db7bdb95ec6e91eb05df0dd119e99c9feb3d7ee9bca8826e087c45ef1539797b                                                                                                        0.0s 
+ => => exporting manifest list sha256:9c3104152ae500b1089fe29f43fb88b367dd62e9041aff1014bc161278885362                                                                                                               0.0s 
+ => => naming to moby-dangling@sha256:9c3104152ae500b1089fe29f43fb88b367dd62e9041aff1014bc161278885362 
 ```
 
 ## Examples
