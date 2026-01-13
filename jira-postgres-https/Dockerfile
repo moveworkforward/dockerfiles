@@ -1,4 +1,4 @@
-FROM atlassian/jira-software:9.2.0-jdk11
+FROM atlassian/jira-software:10.3.8-jdk17
 
 COPY ./server.xml /opt/atlassian/jira/conf
 COPY ./server.xml.j2 /opt/atlassian/etc
